@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+
+
+{%endblock%}
+
+
+{% block body %}
+<div id ="box" class="container">
+<div class="container">
+<div class="title form-group">
+<h1> Sign Up: </h1>
+<form action="/" method="POST">
+    {% csrf_token %}
+    <label> Email: </label> <br>
+    <input id ="input" class ="form-control" type="text" name="email" required><br>
+    <label> Username: </label> <br>
+    <input id ="input" class ="form-control" type="text" name="username" required><br>
+    <label> Password: </label> <br>
+    <input id ="input" class ="form-control" type="text" name="password" required><br>
+    <input class="btn btn-primary" type ="submit" name="Enter" value ="Submit"> <br>
+</form>
+</div>
+</div>
+</div>
+{%endblock%}

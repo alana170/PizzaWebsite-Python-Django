@@ -1,0 +1,35 @@
+{% extends 'base.html'%}
+
+{% block head %}
+<title> Login </title>
+<style>
+    body {
+      background-image: url('/static/pizza.jpg');
+      background-repeat: no-repeat;
+      background-attachment: fixed; 
+      background-size: cover;
+    }
+</style>   
+{% endblock%}
+
+{% block body%}
+
+<div id ="box" class="container">
+    <div class="container">
+        <h1> Welcome to Pinochio's Pizza and Subs </h1>
+        <br>
+        <div class="title form-group">
+            <form action="/" method="POST">
+                {% csrf_token %}
+                <label> Username: </label> <br>
+                <input id ="input" class ="form-control" type="text" name="username" required><br>
+                <label> Password: </label> <br>
+                <input id ="input" class ="form-control" type="text" name="password" required><br>
+                <input class="btn btn-primary" type ="submit" name="Enter" value ="Submit"> <br>
+            </form>
+        </div>  
+        <a href= "signup.html"> Don't have an account? Click here to sign up. </a>
+    </div>
+</div>
+
+{% endblock %}
