@@ -9,6 +9,12 @@
     position: relative;
 }
 
+.alert {
+    padding: 20px;
+    background-color: red; 
+    color: white;
+    margin-bottom: 15px;
+  }
 
 #box{
     background-color:rgb(187, 163, 235); 
@@ -21,4 +27,8 @@
 }
 
 
-
+li {
+    padding: 50px;
+    color: black;
+    margin: 10px;
+}

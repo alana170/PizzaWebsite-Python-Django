@@ -1,35 +1,35 @@
-{% extends 'base.html'%}
+{% extends 'base2.html'%}
 
 {% block head %}
-<title> Login </title>
-<style>
-    body {
-      background-image: url('/static/pizza.jpg');
-      background-repeat: no-repeat;
-      background-attachment: fixed; 
-      background-size: cover;
-    }
-</style>   
+<title> Login </title>   
 {% endblock%}
 
 {% block body%}
-
+<div id="bkg">
 <div id ="box" class="container">
-    <div class="container">
-        <h1> Welcome to Pinochio's Pizza and Subs </h1>
+    <div>
+        <h1 style = "color:red"> Welcome to Pinochio's Pizza and Subs </h1>
+        <!-- <img class = "rounded" src ="/static/pizza.jpg" alt ="pizza" height="200px" width="300px"> -->
         <br>
         <div class="title form-group">
-            <form action="/" method="POST">
+            <form action="/login" method="POST">
                 {% csrf_token %}
-                <label> Username: </label> <br>
+                <label style = "color:white"> Username: </label> <br>
                 <input id ="input" class ="form-control" type="text" name="username" required><br>
-                <label> Password: </label> <br>
+                <label  style = "color:white"> Password: </label> <br>
                 <input id ="input" class ="form-control" type="text" name="password" required><br>
-                <input class="btn btn-primary" type ="submit" name="Enter" value ="Submit"> <br>
+                <input class="btn btn-danger" type ="submit" name="Submit" value ="Submit"> <br>
+                {% if message %}
+                <br>
+                <div class="alert alert-danger">
+                    {{message}}
+                </div>
+                {% endif %}
             </form>
         </div>  
-        <a href= "signup.html"> Don't have an account? Click here to sign up. </a>
+        <br>
+        <a href= "signup"><b> Don't have an account? Click here to sign up. </b> </a>
     </div>
 </div>
-
+</div>
 {% endblock %}
