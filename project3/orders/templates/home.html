@@ -6,33 +6,33 @@
 
 
 {%block body %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar fixed-nav-bar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Pinocchio's Pizza and Subs</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Regular Pizza</a>
+        <li class="nav-item">
+          <a class="nav-link" href="#rp">Regular Pizza</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Sicilian Pizza</a>
+          <a class="nav-link" href="#sp">Sicilian Pizza</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Toppings</a>
+            <a class="nav-link" href="#top">Toppings</a>
           </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Subs</a>
+          <a class="nav-link" href="#subs">Subs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Salads</a>
+            <a class="nav-link" href="#pasta">Pastas</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Pastas</a>
+          <a class="nav-link" href="#salad">Salads</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Dinner Platters</a>
+            <a class="nav-link" href="#dp">Dinner Platters</a>
         </li>
 
         <li class="nav-item dropdown">
@@ -46,11 +46,203 @@
             </div>
           </li>
 
-        <button class="btn btn-outline-success" href = "shoppingcart.html" type="button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cart3" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <form action="/cart"  method = "POST">
+        <button style ="padding:20px;" class="btn btn-outline-success centered" type="submit">
+          {% csrf_token %}
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cart3" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-          </svg></button>
-      </ul>
+          </svg>
+          My Cart
+        </button>
+        </form>
+       </ul>
     </div>
   </nav>
+<div class="container-fluid">
+<div style ="padding-top: 65px;"  class="row" >
+  <div class ="col-sm-8" style="background-color:rgba(179, 23, 23, 0.582); height: auto;">
+    <div class="container">
+      <h2 style= "font-weight:bolder;">
+        <div class= "row" id= "rp"> 
+        <div class ="col-sm-4"> Regular Pizza </div>
+        <div class ="col-sm-4"> Small </div>
+        <div class ="col-sm-4"> Large </div>
+        </div>
+      </h2>
+    
+    
+    {% for product in regular_pizza %}
+   
+    <h3>
+      <div class= "row"> 
+      <div class ="col-sm-4"> {{product.name}} </div>
+
+      <div class ="col-sm-4"> ${{product.SPrice}}      
+        <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      </div>
+      
+      <div class ="col-sm-4"> ${{product.LPrice}} 
+        <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      </div>
+
+      </div>
+    </h3>
+    {%endfor%}
+
+    <div  id = "sp">
+    <img src = "/static/cheese.jpg" alt ="cheese" height="25%" width="25%"> 
+    
+      <img src = "/static/pepperoni.jpg" alt ="cheese" height="25%" width="25%"> 
+    </div>
+
+    <hr class="solid">
+    <h2 style= "font-weight:bolder;">
+      <div class= "row"> 
+      <div class ="col-sm-4"> Sicilian Pizza </div>
+      <div class ="col-sm-4"> Small </div>
+      <div class ="col-sm-4"> Large </div>
+      </div>
+    </h2>
+  
+  
+  {% for product in s_pizza %}
+ 
+  <h3>
+    <div class= "row"> 
+    <div class ="col-sm-4"> {{product.name}} </div>
+
+    <div class ="col-sm-4"> ${{product.SPrice}}      
+      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
+    
+    <div class ="col-sm-4"> ${{product.LPrice}} 
+      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
+
+    </div>
+  </h3>
+  {%endfor%}
+
+  <hr class="solid">
+
+  <h2 style= "font-weight:bolder;">
+    <div class= "row"> 
+    <div class ="col-sm-4" id = "subs"> Subs </div>
+    <div class ="col-sm-4"> Small </div>
+    <div class ="col-sm-4"> Large </div>
+    </div>
+  </h2>
+
+
+{% for product in subs %}
+
+<h3>
+  <div class= "row"> 
+  <div class ="col-sm-4"> {{product.name}} </div>
+
+  <div class ="col-sm-4"> ${{product.SPrice}}      
+    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+  </div>
+  
+  <div class ="col-sm-4"> ${{product.LPrice}} 
+    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+  </div>
+
+  </div>
+</h3>
+{%endfor%}
+
+
+    <hr class="solid">
+    <h2 style= "font-weight:bolder;">
+      <div class= "row"> 
+      <div class ="col-sm-4" id = "pasta"> Pasta </div>
+      <div class ="col-sm-4">  </div>
+      <div class ="col-sm-4">  </div>
+      </div>
+    </h2>
+  
+  
+  {% for product in pasta %}
+ 
+  <h3>
+    <div class= "row"> 
+    <div class ="col-sm-4"> {{product.name}} </div>
+
+    <div class ="col-sm-4">
+    </div>
+    
+    <div class ="col-sm-4"> ${{product.SPrice}} 
+      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
+
+    </div>
+  </h3>
+  {%endfor%}
+
+  
+  <hr class="solid">
+  <h2 style= "font-weight:bolder;">
+    <div class= "row"> 
+    <div class ="col-sm-4" id = "salad"> Salad </div>
+    <div class ="col-sm-4">  </div>
+    <div class ="col-sm-4">  </div>
+    </div>
+  </h2>
+
+
+{% for product in salad %}
+
+<h3>
+  <div class= "row"> 
+  <div class ="col-sm-4"> {{product.name}} </div>
+
+  <div class ="col-sm-4">   
+  
+  </div>
+  
+  <div class ="col-sm-4"> ${{product.SPrice}} 
+    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+  </div>
+
+  </div>
+</h3>
+{%endfor%}
+
+
+<hr class="solid">
+<h2 style= "font-weight:bolder;">
+  <div class= "row"> 
+  <div class ="col-sm-4" id = "dp"> Dinner Platters  </div>
+  <div class ="col-sm-4"> Small </div>
+  <div class ="col-sm-4"> Large </div>
+  </div>
+</h2>
+
+
+{% for product in dinner %}
+
+<h3>
+<div class= "row"> 
+<div class ="col-sm-4"> {{product.name}} </div>
+
+<div class ="col-sm-4"> ${{product.SPrice}}      
+  <button class="btn btn-dark"> <span class="glyphicon glyphicon-plus"></span></button>
+</div>
+
+<div class ="col-sm-4"> ${{product.LPrice}} 
+  <button  class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+</div>
+
+</div>
+</h3>
+{%endfor%}
+
+    </div>
+  </div>
+<div class ="col-sm-4" style="background-color: rgb(250, 250, 226); height: 300vh">
+        <h1>Shopping Cart</h1>
+</div>
+</div>
 
 {% endblock %}

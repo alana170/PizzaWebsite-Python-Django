@@ -4,16 +4,21 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from . import views 
 from django.contrib.auth.models import User
+from orders.models import Product, ProductCategory
 
 # Create your views here.
 def index(request):
     if not request.user.is_authenticated:
         return render(request,'login.html')
-
     context = {
-        "user": request.user
+        "user": request.user,
+        "regular_pizza": Product.objects.filter(category=1),
+        "s_pizza": Product.objects.filter(category=2),
+        "subs": Product.objects.filter(category=3),
+        "pasta": Product.objects.filter(category=4),
+        "salad": Product.objects.filter(category=5),
+        "dinner": Product.objects.filter(category=6)
     }
-    
     return render(request, 'home.html', context)
 
 def signup(request):
@@ -40,3 +45,7 @@ def signin(request):
             return render(request, "login.html", {"message": "Invalid credentials."})
 
     return render(request, 'login.html')
+
+def cart(request):
+    return render(request, 'shoppingcart.html')
+    
