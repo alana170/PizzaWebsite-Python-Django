@@ -2,11 +2,34 @@
 
 {% block head %}
 <title> Home </title>
+<script type="text/javascript">
+
+  function addToCart(productID, size){
+   
+    var jqXHR = $.ajax({
+        type: "POST",
+        url: "/addCart",
+        async: false,
+        data:{'product_id': productID, 'size':size, 'csrfmiddlewaretoken': '{{csrf_token}}'}, 
+        success: function(result){
+          
+          $('#mycart').append('<tr><td>' + result.name+'</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td></tr>');
+          document.getElementById("total").innerHTML = "Total = $" + result.total;    
+        },
+        error: function(result){
+          alert(result.responseJSON.message);
+        }
+
+    });
+}
+
+
+</script>
 {% endblock %}
 
 
 {%block body %}
-<nav class="navbar fixed-nav-bar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar fixed-nav-bar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="#">Pinocchio's Pizza and Subs</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -58,12 +81,15 @@
        </ul>
     </div>
   </nav>
+  <div id= "rp">
+
+  </div>
 <div class="container-fluid">
 <div style ="padding-top: 65px;"  class="row" >
-  <div class ="col-sm-8" style="background-color:rgba(179, 23, 23, 0.582); height: auto;">
+  <div class ="col-sm-8" style="background-color:rgb(224, 166, 166); height: auto;">
     <div class="container">
       <h2 style= "font-weight:bolder;">
-        <div class= "row" id= "rp"> 
+        <div class= "row"> 
         <div class ="col-sm-4"> Regular Pizza </div>
         <div class ="col-sm-4"> Small </div>
         <div class ="col-sm-4"> Large </div>
@@ -77,23 +103,41 @@
       <div class= "row"> 
       <div class ="col-sm-4"> {{product.name}} </div>
 
-      <div class ="col-sm-4"> ${{product.SPrice}}      
-        <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <div class ="col-sm-4"> ${{product.SPrice}} 
+          
+        <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
       
       <div class ="col-sm-4"> ${{product.LPrice}} 
-        <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+        <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
 
       </div>
     </h3>
     {%endfor%}
 
-    <div  id = "sp">
-    <img src = "/static/cheese.jpg" alt ="cheese" height="25%" width="25%"> 
     
-      <img src = "/static/pepperoni.jpg" alt ="cheese" height="25%" width="25%"> 
-    </div>
+      <div class="container">
+  
+        <div class="row">
+          <div class="col-md-4">
+            <div class="thumbnail">  
+              <img src = "/static/cheese.jpg" alt ="cheese"> 
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="thumbnail" id = "sp">
+             
+              <img src = "/static/pepperoni.jpg" alt ="pep" > 
+      
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    
 
     <hr class="solid">
     <h2 style= "font-weight:bolder;">
@@ -112,22 +156,59 @@
     <div class ="col-sm-4"> {{product.name}} </div>
 
     <div class ="col-sm-4"> ${{product.SPrice}}      
-      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
     
     <div class ="col-sm-4"> ${{product.LPrice}} 
-      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
 
     </div>
   </h3>
   {%endfor%}
+<div class = "container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class= "thumbnail" id ="top">  
+        <img src = "/static/sicilian.jpg" alt ="sicilian"> 
+      </div> 
+    </div>
+  </div>
+</div>
+
+
+<hr class ="solid">
+
+<h2 > <b> Toppings</b> </h2>
+<div class ="container">
+<ul class="list-group">
+  <li class="list-group-item">Pepperoni</li>
+  <li class="list-group-item">Sausage</li>
+  <li class="list-group-item">Mushrooms</li>
+  <li class="list-group-item">Onions</li>
+  <li class="list-group-item"> Ham </li>
+  <li class="list-group-item">Canadian Bacon</li>
+  <li class="list-group-item">Pineapple</li>
+  <li class="list-group-item">Eggplant</li>
+  <li class="list-group-item">Tomato and Basil</li>
+  <li class="list-group-item"> Green Peppers </li>
+  <li class="list-group-item">Hamburger</li>
+  <li class="list-group-item">Spinach</li>
+  <li class="list-group-item">Artichoke</li>
+  <li class="list-group-item"> Buffalo Chicken </li>
+  <li class="list-group-item">Barbeque Chicken </li>
+  <li id = "subs" class="list-group-item">Anchovies</li>
+  <li class="list-group-item">Black Olives</li>
+  <li class="list-group-item">Fresh Garlic </li>
+  <li class="list-group-item">Zucchini </li>
+</ul>
+</div>
 
   <hr class="solid">
 
   <h2 style= "font-weight:bolder;">
     <div class= "row"> 
-    <div class ="col-sm-4" id = "subs"> Subs </div>
+    <div class ="col-sm-4"> Subs </div>
     <div class ="col-sm-4"> Small </div>
     <div class ="col-sm-4"> Large </div>
     </div>
@@ -141,22 +222,31 @@
   <div class ="col-sm-4"> {{product.name}} </div>
 
   <div class ="col-sm-4"> ${{product.SPrice}}      
-    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
   
   <div class ="col-sm-4"> ${{product.LPrice}} 
-    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
 
   </div>
 </h3>
 {%endfor%}
 
+<div class = "container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class= "thumbnail" id ="pasta">  
+        <img src = "/static/sub2.jpg" alt ="subs"> 
+      </div> 
+    </div>
+  </div>
+</div>
 
     <hr class="solid">
     <h2 style= "font-weight:bolder;">
       <div class= "row"> 
-      <div class ="col-sm-4" id = "pasta"> Pasta </div>
+      <div class ="col-sm-4"> Pasta </div>
       <div class ="col-sm-4">  </div>
       <div class ="col-sm-4">  </div>
       </div>
@@ -173,18 +263,28 @@
     </div>
     
     <div class ="col-sm-4"> ${{product.SPrice}} 
-      <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
 
     </div>
   </h3>
   {%endfor%}
 
+  <div class = "container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class= "thumbnail"  id = "salad">  
+          <img src = "/static/pasta.jpg" alt ="pasta"> 
+        </div> 
+      </div>
+    </div>
+  </div>
+
   
   <hr class="solid">
   <h2 style= "font-weight:bolder;">
     <div class= "row"> 
-    <div class ="col-sm-4" id = "salad"> Salad </div>
+    <div class ="col-sm-4"> Salad </div>
     <div class ="col-sm-4">  </div>
     <div class ="col-sm-4">  </div>
     </div>
@@ -202,18 +302,28 @@
   </div>
   
   <div class ="col-sm-4"> ${{product.SPrice}} 
-    <button class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
 
   </div>
 </h3>
 {%endfor%}
 
+<div class = "container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class= "thumbnail" id = "dp">  
+        <img src = "/static/salad.jpg" alt ="salad"> 
+      </div> 
+    </div>
+  </div>
+</div>
+
 
 <hr class="solid">
 <h2 style= "font-weight:bolder;">
   <div class= "row"> 
-  <div class ="col-sm-4" id = "dp"> Dinner Platters  </div>
+  <div class ="col-sm-4"> Dinner Platters  </div>
   <div class ="col-sm-4"> Small </div>
   <div class ="col-sm-4"> Large </div>
   </div>
@@ -227,22 +337,50 @@
 <div class ="col-sm-4"> {{product.name}} </div>
 
 <div class ="col-sm-4"> ${{product.SPrice}}      
-  <button class="btn btn-dark"> <span class="glyphicon glyphicon-plus"></span></button>
+  <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"> <span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
 <div class ="col-sm-4"> ${{product.LPrice}} 
-  <button  class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+  <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
 </div>
 </h3>
 {%endfor%}
 
+<div class = "container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class= "thumbnail">  
+        <img src = "/static/platter.jpg" alt ="platter"> 
+      </div> 
+    </div>
+  </div>
+</div>
+
+
+
     </div>
   </div>
 <div class ="col-sm-4" style="background-color: rgb(250, 250, 226); height: 300vh">
         <h1>Shopping Cart</h1>
+        <div>
+          <table class ="table table-dark" id="mycart" >
+            <th scope ="col">
+              Product Name 
+            </th>
+            <th scope ="col">
+              Size
+            </th>
+            <th scope ="col">
+              Price
+            </th>
+          </table> 
+          <hr> 
+          <h3 scope="row" style ="float:right" id = "total"> </h3>
+        </div>
 </div>
 </div>
+
 
 {% endblock %}

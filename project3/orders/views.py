@@ -1,10 +1,11 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from . import views 
 from django.contrib.auth.models import User
-from orders.models import Product, ProductCategory
+from orders.models import Product, ProductCategory, OrderMain, OrderDetails
+import datetime 
 
 # Create your views here.
 def index(request):
@@ -49,3 +50,36 @@ def signin(request):
 def cart(request):
     return render(request, 'shoppingcart.html')
     
+def addToCart(request):
+    if request.method == "POST" and request.is_ajax():
+        try: 
+            pid = request.POST['product_id']
+            size = request.POST['size']
+            name = Product.objects.get(pk=pid).category.name + " - " + Product.objects.get(pk=pid).name
+            price = 0
+            if size == "large" :
+                price = Product.objects.get(pk=pid).LPrice
+            else:
+                price = Product.objects.get(pk=pid).SPrice
+
+            print(request.user)
+            i = 0
+            try:
+                openOrder = OrderMain.objects.filter(userid = request.user)
+                i= openOrder.id
+            except (OrderMain.DoesNotExist):
+                openOrder = OrderMain(userid = request.user, status = "open", total = price, createdDate= datetime.date.today())
+                openOrder.save()
+                openOrder = OrderMain.objects.filter(userid = request.user)
+                i= openOrder.id
+             
+            od = OrderDetails(orderid = i, productid = pid, toppings="", price = price, size= size, productName= name, total = price, quantity = 1)
+            od.save()
+
+            return JsonResponse({"message": "Successfully added to cart!", "name":name, "price":price, "size": size, "total":""}, status=200)
+        except Exception as err:
+            print(err)
+            return JsonResponse({"message": err}, status=400)
+    size =request.POST['size']
+
+   

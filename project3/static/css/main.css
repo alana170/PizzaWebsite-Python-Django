@@ -46,3 +46,15 @@ li {
   hr.solid {
     border-top: 3px solid grey;
   }
+
+  .image {
+    width: 50%;
+    height: 50%;
+  }
+
+  .list-group-item {
+    background-color: rgb(224, 166, 166);
+    width:50%;
+    border-color: grey;
+  }
+  
