@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title> Order Summary </title>
+<script>
+
+    function updateOrderStatus(){
+   
+        var jqXHR = $.ajax({
+            type: "POST",
+            url: "/",
+            async: false,
+            data:{'csrfmiddlewaretoken': '{{csrf_token}}'}, 
+            success: function(result){
+                alert("Order has been placed. Check your 'My Orders' Page to see the status of order.");
+            },
+            error: function(result){
+              alert(result.responseJSON.message);
+            }
+    
+        });
+    }
+</script>
+<style>
+   body {
+    background-color: lightpink;
+   }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class= "container">        
+<h1> Order Summary </h1>
+{%if items is not None %}
+<h5 style= "float:left"> Confirm your order below: </h5>
+
+<a href ="/" style="float:right">Go Back to Cart</a>
+
+<table class ="table table-light" id="mycart" >
+    <tr>
+    <th scope ="col">
+      Product Name 
+    </th>
+    <th scope ="col">
+      Size
+    </th>
+    <th scope ="col">
+      Price
+    </th>
+    </tr>
+    {%endif%}
+    {% for item in items %}
+    <tr scope="row">
+      <td>
+        {{item.productName}}
+      </td>
+      <td>
+        {{item.size}}
+      </td>
+      <td>
+        ${{item.price}}
+      </td>
+    </tr>
+  {% empty %}
+  <h2> <a href = "/"> {{message}}</a> </h2>
+  {%endfor%}
+</table> 
+
+  {% if items is not None %}
+  <h1> Total = ${{total}}</h1>
+  <br>
+  <button class = "btn btn-success" onclick="updateOrderStatus()">  Place Your Order </button>
+  {% endif %}
+</div>
+{% endblock %}
