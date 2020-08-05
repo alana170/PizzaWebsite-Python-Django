@@ -28,7 +28,8 @@ def index(request):
         "salad": Product.objects.filter(category=5),
         "dinner": Product.objects.filter(category=6),
         "items": items,
-        "total" : total
+        "total" : total,
+        "toppings": Product.objects.filter(category=7)
     }
 
     return render(request, 'home.html', context)
@@ -70,6 +71,8 @@ def addToCart(request):
         try: 
             pid = request.POST['product_id']
             size = request.POST['size']
+            toppings = request.POST['toppings']
+            print("toppings = " + toppings)
             name = Product.objects.get(pk=pid).category.name + " - " + Product.objects.get(pk=pid).name
             price = 0.0
             if size == "large" :
@@ -79,7 +82,10 @@ def addToCart(request):
 
             
             try:
-                openOrder = OrderMaster.objects.filter(userid = request.user, status ="open").first()
+                openOrder = OrderMaster.objects.filter(userid = request.user, status ="open").first() 
+                if openOrder is None : 
+                    openOrder = OrderMaster(userid = request.user, status = "open", total = price, createdDate= datetime.date.today())
+                    openOrder.save()
             except OrderMaster.DoesNotExist:
                 openOrder = OrderMaster(userid = request.user, status = "open", total = price, createdDate= datetime.date.today())
                 openOrder.save()
@@ -88,7 +94,7 @@ def addToCart(request):
                
             openOrder = OrderMaster.objects.filter(userid = request.user, status="open").first() 
               
-            od = OrderDetail(orderid = openOrder, productid = pid, toppings="", price = price, size= size, productName= name, total = price, quantity = 1)
+            od = OrderDetail(orderid = openOrder, productid = pid, toppings=toppings, price = price, size= size, productName= name, total = price, quantity = 1)
             od.save() 
             odid = od.id
             queryset = OrderDetail.objects.filter(orderid = openOrder)
@@ -98,7 +104,6 @@ def addToCart(request):
 
             openOrder.total = total
             openOrder.save()
-
             return JsonResponse({"message": "Successfully added to cart!", "name":name, "price":price, "size": size, "total": total, "id" : odid}, status=200)
         
         except Exception as err:
@@ -125,6 +130,21 @@ def delete_item(request) :
             print(err)
             return JsonResponse({"message": err}, status=400)
 
+
+def clearCart(request) :
+    if request.method == "POST" and request.is_ajax():
+        try: 
+            openOrder = OrderMaster.objects.filter(userid = request.user, status="open").first() 
+            openOrder.status = "deleted"
+            openOrder.save()
+
+            return JsonResponse({"message": "Successfully cleared all from cart!"}, status=200)
+        
+        except Exception as err:
+            print(err)
+            return JsonResponse({"message": err}, status=400)    
+
+
 def ordered(request) : 
     items = None
     total = 0
@@ -136,6 +156,7 @@ def ordered(request) :
             openOrder.status = "in progress"
             openOrder.save()
             message = "Order is in progress..."
+            
     else:
         openOrder = OrderMaster.objects.filter(userid = request.user, status="open").first() 
         

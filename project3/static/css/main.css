@@ -58,3 +58,6 @@ li {
     border-color: grey;
   }
   
+  .hide {
+    display: hide;
+  }

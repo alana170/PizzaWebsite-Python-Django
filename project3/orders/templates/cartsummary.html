@@ -8,11 +8,12 @@
    
         var jqXHR = $.ajax({
             type: "POST",
-            url: "/",
+            url: "/placeOrder",
             async: false,
             data:{'csrfmiddlewaretoken': '{{csrf_token}}'}, 
             success: function(result){
-                alert("Order has been placed. Check your 'My Orders' Page to see the status of order.");
+                alert("Order has been placed. Check your 'Order History' Page to see the status of order.");
+                window.location.pathname = '/';
             },
             error: function(result){
               alert(result.responseJSON.message);
@@ -20,6 +21,8 @@
     
         });
     }
+
+
 </script>
 <style>
    body {
@@ -32,9 +35,11 @@
 
 <div class= "container">        
 <h1> Order Summary </h1>
+{%if items is None%}
+  <h3> <a href="/"> Cart is Empty! Click here to go back. </a> </h3>
+{%endif%}
 {%if items is not None %}
 <h5 style= "float:left"> Confirm your order below: </h5>
-
 <a href ="/" style="float:right">Go Back to Cart</a>
 
 <table class ="table table-light" id="mycart" >
@@ -54,6 +59,10 @@
     <tr scope="row">
       <td>
         {{item.productName}}
+          {% if item.toppings != "" %}
+            <br>
+            ({{item.toppings}})
+          {%endif%}
       </td>
       <td>
         {{item.size}}
@@ -62,9 +71,11 @@
         ${{item.price}}
       </td>
     </tr>
+    
   {% empty %}
-  <h2> <a href = "/"> {{message}}</a> </h2>
+  <h1> <a href= "/" > {{message}} </a></h1>
   {%endfor%}
+  
 </table> 
 
   {% if items is not None %}

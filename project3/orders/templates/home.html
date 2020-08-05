@@ -4,17 +4,37 @@
 <title> Home </title>
 <script type="text/javascript">
 
-  function addToCart(productID, size){
-   
+  function addToCart(productID, size, toppings){
+    var selTop = "";
+    if (toppings>0)
+    {
+      $('#prodId').val(productID);
+      $('#size').val(size);
+      $('#tpCount').val(toppings);
+      document.getElementById('tinfo').innerHTML = "You can choose up to "  +toppings + " toppings."
+      $('#myModal').modal('show');
+      return true;
+    }
+    if (toppings == -1){
+      selTop = $('#topping').val();
+      $('#topping').val("");
+    }
+
     var jqXHR = $.ajax({
         type: "POST",
         url: "/addCart",
         async: false,
-        data:{'product_id': productID, 'size':size, 'csrfmiddlewaretoken': '{{csrf_token}}'}, 
+        data:{'product_id': productID, 'size':size, 'toppings': selTop, 'csrfmiddlewaretoken': '{{csrf_token}}'}, 
         success: function(result){
-          
-          $('#mycart').append('<tr><td>' + result.name+'</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td> <td> <button class = "btn btn-dark" onclick = "deleteItem('+result.id+ ', this)" > <span class="glyphicon glyphicon-trash"></span> </button> </td> </tr>');
-          document.getElementById("total").innerHTML = "Total = $" + result.total;    
+          if(selTop == "") {
+            $('#mycart').append('<tr><td>' + result.name+ '</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td> <td> <button class = "btn btn-dark" onclick = "deleteItem('+result.id+ ', this)" > <span class="glyphicon glyphicon-trash"></span> </button> </td> </tr>');
+            document.getElementById("total").innerHTML = "Total = $" + result.total;    
+          }
+          else{
+          $('#mycart').append('<tr><td>' + result.name+'<br>('+selTop+ ')</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td> <td> <button class = "btn btn-dark" onclick = "deleteItem('+result.id+ ', this)" > <span class="glyphicon glyphicon-trash"></span> </button> </td> </tr>');
+          document.getElementById("total").innerHTML = "Total = $" + result.total; 
+          }
+          show();
         },
         error: function(result){
           alert(result.responseJSON.message);
@@ -34,12 +54,79 @@ function deleteItem(id, row){
         alert(result.message)
         $(row).closest("tr").remove();
         document.getElementById("total").innerHTML = "Total = $" + result.total;  
+        if(result.total == 0.00){
+          hide();
+        }
       },
       error: function(result){
         alert(result.responseJSON.message);
       }
 
   });
+}
+
+function show() {
+      document.getElementById('confirmOrderbtn').style.display='block';      
+}
+
+
+function hide() {
+    document.getElementById('confirmOrderbtn').style.display='none';
+  }  
+
+function addToppings() {
+    var toppings = "";
+    $. each($("input[name='top']:checked"), function(){
+    toppings = toppings +", " + $(this). val();
+    toppings = toppings.substring(1);
+  })
+  var count= countToppings();
+  var limitTop = $('#tpCount').val();
+  var x = parseInt(limitTop, 10);
+ 
+  if(count > x)
+  { 
+    document.getElementById('modalMessage').innerHTML = "You can only choose up to "+ limitTop + " toppings!";
+    let divElement = document.querySelector("modalMessage");
+    document.getElementById('modalMessage').className = "alert alert-danger";
+    return false;
+  }
+  var productID =  $('#prodId').val();
+  var size = $('#size').val();
+  $('#topping').val(toppings);
+  addToCart(productID, size, -1);
+  document.getElementById('modalMessage').className = "hide";
+  $('#myModal').modal('hide');
+}  
+
+function countToppings() {
+var count = 0;
+count = $('input[type="checkbox"]:checked').length;
+return count;
+}
+ 
+function clearCart() {
+  answer = confirm("Are you sure you want to clear your cart?");
+  if (answer){ 
+    var jqXHR = $.ajax({
+      type: "POST",
+      url: "/clearCart",
+      async: false,
+      data:{'csrfmiddlewaretoken': '{{csrf_token}}'}, 
+      success: function(result){
+        $( "#mycart tbody tr" ).each( function(){
+          this.parentNode.removeChild( this ); 
+        });
+        $('#mycart').append('<tr> <th scope ="col"> Product Name </th> <th scope ="col"> Size </th> <th scope ="col"> Price </th><th> </th></tr>');
+        document.getElementById("total").innerHTML = "Total = $" + 0.00;  
+        hide();
+      },
+      error: function(result){
+        alert(result.responseJSON.message);
+      }
+
+  })
+}
 }
 
 </script>
@@ -82,8 +169,7 @@ function deleteItem(id, row){
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <a class="dropdown-item" href="#">My Profile</a>
-              <a class="dropdown-item" href="#">My Orders</a>
-              <a class="dropdown-item" href="#">Favorites</a>
+              <a class="dropdown-item" href="#"> Order History </a>
             </div>
           </li>
           <li class="nav-item">
@@ -128,11 +214,11 @@ function deleteItem(id, row){
 
       <div class ="col-sm-4"> ${{product.SPrice}} 
           
-        <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+        <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
       
       <div class ="col-sm-4"> ${{product.LPrice}} 
-        <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+        <button onclick ="addToCart({{product.id}}, 'large', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
 
       </div>
@@ -179,11 +265,11 @@ function deleteItem(id, row){
     <div class ="col-sm-4"> {{product.name}} </div>
 
     <div class ="col-sm-4"> ${{product.SPrice}}      
-      <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
     
     <div class ="col-sm-4"> ${{product.LPrice}} 
-      <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'large', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
 
     </div>
@@ -199,33 +285,41 @@ function deleteItem(id, row){
   </div>
 </div>
 
-
-<hr class ="solid">
-
-<h2 > <b> Toppings</b> </h2>
-<div class ="container">
-<ul class="list-group">
-  <li class="list-group-item">Pepperoni</li>
-  <li class="list-group-item">Sausage</li>
-  <li class="list-group-item">Mushrooms</li>
-  <li class="list-group-item">Onions</li>
-  <li class="list-group-item"> Ham </li>
-  <li class="list-group-item">Canadian Bacon</li>
-  <li class="list-group-item">Pineapple</li>
-  <li class="list-group-item">Eggplant</li>
-  <li class="list-group-item">Tomato and Basil</li>
-  <li class="list-group-item"> Green Peppers </li>
-  <li class="list-group-item">Hamburger</li>
-  <li class="list-group-item">Spinach</li>
-  <li class="list-group-item">Artichoke</li>
-  <li class="list-group-item"> Buffalo Chicken </li>
-  <li class="list-group-item">Barbeque Chicken </li>
-  <li id = "subs" class="list-group-item">Anchovies</li>
-  <li class="list-group-item">Black Olives</li>
-  <li class="list-group-item">Fresh Garlic </li>
-  <li class="list-group-item">Zucchini </li>
-</ul>
+<!-- Modal -->
+<div id = "myModal" class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="exampleModalLongTitle">Select Your Toppings</h2>
+        
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4 id="tinfo"> </h4>
+        <br>
+          <h5 id ="modalMessage"> </h5>
+          <input type="text" id = "prodId" class ="hide"> 
+          <input type="text" id = "size" class ="hide"> 
+          <input type="text" id = "topping" class ="hide">
+          <input type="text" id = "tpCount" class ="hide">
+              {%for tp in toppings%}
+              <div class ="column">
+                <input onclick = "countToppings()" type="checkbox" id="{{tp}}" name="top" value="{{tp}}">
+                <label for="{{tp}}"> {{tp}} </label>
+              </div>
+              {%endfor%}
+          
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" onclick= "addToppings()"  class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
+
 
   <hr class="solid">
 
@@ -245,11 +339,11 @@ function deleteItem(id, row){
   <div class ="col-sm-4"> {{product.name}} </div>
 
   <div class ="col-sm-4"> ${{product.SPrice}}      
-    <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
   
   <div class ="col-sm-4"> ${{product.LPrice}} 
-    <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'large', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
 
   </div>
@@ -286,7 +380,7 @@ function deleteItem(id, row){
     </div>
     
     <div class ="col-sm-4"> ${{product.SPrice}} 
-      <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+      <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
 
     </div>
@@ -325,7 +419,7 @@ function deleteItem(id, row){
   </div>
   
   <div class ="col-sm-4"> ${{product.SPrice}} 
-    <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+    <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
   </div>
 
   </div>
@@ -360,11 +454,11 @@ function deleteItem(id, row){
 <div class ="col-sm-4"> {{product.name}} </div>
 
 <div class ="col-sm-4"> ${{product.SPrice}}      
-  <button onclick ="addToCart({{product.id}}, 'small')" class="btn btn-dark"> <span class="glyphicon glyphicon-plus"></span></button>
+  <button onclick ="addToCart({{product.id}}, 'small', {{product.toppings}})" class="btn btn-dark"> <span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
 <div class ="col-sm-4"> ${{product.LPrice}} 
-  <button onclick ="addToCart({{product.id}}, 'large')" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
+  <button onclick ="addToCart({{product.id}}, 'large', {{product.toppings}})" class="btn btn-dark"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
 </div>
@@ -389,6 +483,7 @@ function deleteItem(id, row){
         <h1>Shopping Cart</h1>
         <div>
           <table class ="table table-dark" id="mycart" >
+            <tbody>
             <tr>
             <th scope ="col">
               Product Name 
@@ -408,7 +503,12 @@ function deleteItem(id, row){
             <tr>
               <td>
                 {{item.productName}}
+                {% if item.toppings != "" %}
+                <br>
+                 ({{item.toppings}})
+                {%endif%}
               </td>
+            
               <td>
                 {{item.size}}
               </td>
@@ -419,14 +519,25 @@ function deleteItem(id, row){
                 <button class = "btn btn-dark" onclick ="deleteItem({{item.id}}, this)" > <span class="glyphicon glyphicon-trash"></span> </button> 
               </td>
             </tr>
+            
             {% empty %}
             {%endfor%}
+            </tbody>
           </table> 
 
 
           <hr> 
           <h3 scope="row" style ="float:right" id = "total"> Total = {{total}}</h3>
-            <button class = "btn btn-success"> <a href="/placeOrder" style="color:white"> Confirm Your Order</a></button>
+
+          {% if total > 0.00 %}
+          <div id = "confirmOrderbtn" style = "display: block;">
+          {%else%}
+          <div id = "confirmOrderbtn" style = "display: none;">
+          {%endif%}
+          <button class = "btn btn-success"> <a href="/placeOrder" style="color:white"> Confirm Your Order</a></button>  
+          <button class = "btn btn-success" onclick = "clearCart()"> Clear Cart </button>  
+         </div> 
+
         </div>
 </div>
 </div>

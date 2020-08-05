@@ -16,7 +16,7 @@ class Product(models.Model):
     toppings = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.name}  Small: {self.SPrice} Large: {self.LPrice}"
+        return f"{self.name}"
 
 
 class OrderMaster(models.Model):
