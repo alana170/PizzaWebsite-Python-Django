@@ -12,8 +12,8 @@
             async: false,
             data:{'csrfmiddlewaretoken': '{{csrf_token}}'}, 
             success: function(result){
-                alert("Order has been placed. Check your 'Order History' Page to see the status of order.");
-                window.location.pathname = '/';
+                alert("Order has been successfully placed.");
+                window.location.pathname = '/orderhistory';
             },
             error: function(result){
               alert(result.responseJSON.message);
@@ -40,7 +40,7 @@
 {%endif%}
 {%if items is not None %}
 <h5 style= "float:left"> Confirm your order below: </h5>
-<a href ="/" style="float:right">Go Back to Cart</a>
+<a href ="/" style="float:right">Go Back to Home</a>
 
 <table class ="table table-light" id="mycart" >
     <tr>
@@ -79,7 +79,7 @@
 </table> 
 
   {% if items is not None %}
-  <h1> Total = ${{total}}</h1>
+  <h1> Total: ${{total}}</h1>
   <br>
   <button class = "btn btn-success" onclick="updateOrderStatus()">  Place Your Order </button>
   {% endif %}

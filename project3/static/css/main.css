@@ -61,3 +61,16 @@ li {
   .hide {
     display: hide;
   }
+
+  #centerTable {
+    width: 60%; 
+    margin-left:20%; 
+    margin-right:20%;
+  }
+
+  .topright {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 18px;
+    }

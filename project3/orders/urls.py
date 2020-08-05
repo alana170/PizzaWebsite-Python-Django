@@ -12,4 +12,7 @@ urlpatterns = [
     path("deleteItem", views.delete_item, name="deleteItem"),
     path("placeOrder", views.ordered, name="placeOrder"),
     path("clearCart", views.clearCart, name="clearCart"),
+    path("orderhistory", views.orderhistory, name="orderhistory"),
+    path("orderdetails/<int:id>", views.orderdetails, name="orderdetails"),
+    path("cancelOrder", views.cancelOrder, name="cancelOrder"),
 ]

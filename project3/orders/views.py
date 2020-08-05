@@ -172,3 +172,42 @@ def ordered(request) :
         "total" : total
     }
     return render(request, "cartsummary.html", context)
+
+def orderhistory(request): 
+    progressOrders = None
+    completedOrders = None
+    cancelledOrders = None
+    if request.method=="GET":
+        progressOrders = OrderMaster.objects.filter(userid = request.user, status="in progress").order_by('-createdDate').all()
+        completedOrders = OrderMaster.objects.filter(userid = request.user, status="completed").order_by('-createdDate').all()
+        cancelledOrders = OrderMaster.objects.filter(userid = request.user, status="cancelled").order_by('-createdDate').all()
+
+    context = {
+        "pOrders" : progressOrders,
+        "cOrders": completedOrders,
+        "dOrders" : cancelledOrders,
+    }
+    return render(request, "orderhistory.html", context)
+
+def orderdetails(request, id):
+    order = OrderDetail.objects.filter(orderid = id).all()
+    total = OrderMaster.objects.get(pk= id).total
+    context = {
+        "order" : order,
+        "total" : total,
+    }
+    return render(request, "orderdetails.html", context)
+
+def cancelOrder(request) :
+    if request.method=="POST" and request.is_ajax():
+        try:
+            id = request.POST["id"]
+            cancel_order = OrderMaster.objects.get(pk =id)
+            cancel_order.status = "cancelled"
+            cancel_order.save()
+            return JsonResponse({"message": "Successfully cancelled order!"}, status=200)
+        except Exception as err:
+            print(err)
+            return JsonResponse({"message": err}, status=400)    
+
+    

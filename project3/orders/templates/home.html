@@ -28,11 +28,11 @@
         success: function(result){
           if(selTop == "") {
             $('#mycart').append('<tr><td>' + result.name+ '</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td> <td> <button class = "btn btn-dark" onclick = "deleteItem('+result.id+ ', this)" > <span class="glyphicon glyphicon-trash"></span> </button> </td> </tr>');
-            document.getElementById("total").innerHTML = "Total = $" + result.total;    
+            document.getElementById("total").innerHTML = "Total: $" + result.total;    
           }
           else{
           $('#mycart').append('<tr><td>' + result.name+'<br>('+selTop+ ')</td><td>' +result.size + '</td><td>' +'$'+result.price + '</td> <td> <button class = "btn btn-dark" onclick = "deleteItem('+result.id+ ', this)" > <span class="glyphicon glyphicon-trash"></span> </button> </td> </tr>');
-          document.getElementById("total").innerHTML = "Total = $" + result.total; 
+          document.getElementById("total").innerHTML = "Total: $" + result.total; 
           }
           show();
         },
@@ -44,7 +44,7 @@
 }
 
 function deleteItem(id, row){
-  //alert(id + " going to be deleted")
+  
   var jqXHR = $.ajax({
       type: "POST",
       url: "/deleteItem",
@@ -53,7 +53,7 @@ function deleteItem(id, row){
       success: function(result){
         alert(result.message)
         $(row).closest("tr").remove();
-        document.getElementById("total").innerHTML = "Total = $" + result.total;  
+        document.getElementById("total").innerHTML = "Total: $" + result.total;  
         if(result.total == 0.00){
           hide();
         }
@@ -74,19 +74,26 @@ function hide() {
     document.getElementById('confirmOrderbtn').style.display='none';
   }  
 
+function resetToppings() {
+  $('input:checkbox').each(function() { this.checked = false; });
+  document.getElementById('modalMessage').className = "hide";
+}
+
+
 function addToppings() {
     var toppings = "";
     $. each($("input[name='top']:checked"), function(){
     toppings = toppings +", " + $(this). val();
-    toppings = toppings.substring(1);
   })
+  toppings = toppings.substring(1);
+
   var count= countToppings();
   var limitTop = $('#tpCount').val();
   var x = parseInt(limitTop, 10);
  
   if(count > x)
   { 
-    document.getElementById('modalMessage').innerHTML = "You can only choose up to "+ limitTop + " toppings!";
+    document.getElementById('modalMessage').innerHTML = "Oh no! You exceeded "+ limitTop + " toppings!";
     let divElement = document.querySelector("modalMessage");
     document.getElementById('modalMessage').className = "alert alert-danger";
     return false;
@@ -96,6 +103,7 @@ function addToppings() {
   $('#topping').val(toppings);
   addToCart(productID, size, -1);
   document.getElementById('modalMessage').className = "hide";
+  resetToppings()
   $('#myModal').modal('hide');
 }  
 
@@ -118,7 +126,7 @@ function clearCart() {
           this.parentNode.removeChild( this ); 
         });
         $('#mycart').append('<tr> <th scope ="col"> Product Name </th> <th scope ="col"> Size </th> <th scope ="col"> Price </th><th> </th></tr>');
-        document.getElementById("total").innerHTML = "Total = $" + 0.00;  
+        document.getElementById("total").innerHTML = "Total: $" + 0.00;  
         hide();
       },
       error: function(result){
@@ -135,7 +143,7 @@ function clearCart() {
 
 {%block body %}
 <nav class="navbar fixed-nav-bar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Pinocchio's Pizza and Subs</a>
+    <a class="navbar-brand" href="/">Pinocchio's Pizza and Subs</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -148,11 +156,8 @@ function clearCart() {
           <a class="nav-link" href="#sp">Sicilian Pizza</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#top">Toppings</a>
+            <a class="nav-link" href="#top">Subs</a>
           </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#subs">Subs</a>
-        </li>
         <li class="nav-item">
             <a class="nav-link" href="#pasta">Pastas</a>
         </li>
@@ -169,7 +174,7 @@ function clearCart() {
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <a class="dropdown-item" href="#">My Profile</a>
-              <a class="dropdown-item" href="#"> Order History </a>
+              <a class="dropdown-item" href="/orderhistory"> Order History </a>
             </div>
           </li>
           <li class="nav-item">
@@ -292,7 +297,7 @@ function clearCart() {
       <div class="modal-header">
         <h2 class="modal-title" id="exampleModalLongTitle">Select Your Toppings</h2>
         
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button onclick = "resetToppings()" type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -313,7 +318,7 @@ function clearCart() {
           
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" onclick = "resetToppings()" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" onclick= "addToppings()"  class="btn btn-primary">Save changes</button>
       </div>
     </div>
@@ -527,7 +532,7 @@ function clearCart() {
 
 
           <hr> 
-          <h3 scope="row" style ="float:right" id = "total"> Total = {{total}}</h3>
+          <h3 scope="row" style ="float:right" id = "total"> Total: {{total}}</h3>
 
           {% if total > 0.00 %}
           <div id = "confirmOrderbtn" style = "display: block;">
