@@ -120,6 +120,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),]
+
+if DEBUG:
+    #test keys here
+    STRIPE_PUBLISHABLE_KEY = 'pk_test_51HDKj6GM1nFLbkHBeYrvsVFWHYDkQujQ03eNPUhMrrc7r1s9mgn2ek9BFUT9KjAqEbA8KE0WyHvFcg0x7Jv4VReG005saLUOHK'
+    STRIPE_SECRET_KEY = 'sk_test_51HDKj6GM1nFLbkHBXr8jJ1IOSSHqadxmYNiYPNnmxPO3pA6I87bszcwdF03Wq69iCMUAV9eKI6QV4hDCu2m7GXpp00I147paoc'
+else:
+    # active keys go here
+    STRIPE_PUBLISHABLE_KEY = 'pk_test_51HDKj6GM1nFLbkHBeYrvsVFWHYDkQujQ03eNPUhMrrc7r1s9mgn2ek9BFUT9KjAqEbA8KE0WyHvFcg0x7Jv4VReG005saLUOHK'
+    STRIPE_SECRET_KEY = 'sk_test_51HDKj6GM1nFLbkHBXr8jJ1IOSSHqadxmYNiYPNnmxPO3pA6I87bszcwdF03Wq69iCMUAV9eKI6QV4hDCu2m7GXpp00I147paoc'
+
 

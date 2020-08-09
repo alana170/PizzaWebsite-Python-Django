@@ -7,7 +7,11 @@ from django.contrib.auth.models import User
 from orders.models import Product, ProductCategory, OrderMaster, OrderDetail
 import datetime 
 from decimal import Decimal
+import stripe
+import json
+import os
 
+stripe.api_key = 'sk_test_51HDKj6GM1nFLbkHBXr8jJ1IOSSHqadxmYNiYPNnmxPO3pA6I87bszcwdF03Wq69iCMUAV9eKI6QV4hDCu2m7GXpp00I147paoc'
 # Create your views here.
 def index(request):
     if not request.user.is_authenticated:
@@ -210,4 +214,38 @@ def cancelOrder(request) :
             print(err)
             return JsonResponse({"message": err}, status=400)    
 
-    
+def checkUser(request) : 
+    if request.method=="POST" and request.is_ajax():
+        try:
+            username = request.POST["username"]
+            if User.objects.get(username=username) is not None : 
+                return JsonResponse({"message": "Username already exists."}, status=200)
+            else: 
+                return JsonResponse({"message" : "Username is not taken yet."}, status=200)
+
+        except Exception as err:
+            print(err)
+            return JsonResponse({"message": err}, status=400)   
+
+def checkout(request) :
+    if request.method == "POST" :
+        try: 
+            total = OrderMaster.objects.filter(userid = request.user, status="open").first().total 
+            u = request.user
+            email = u.email
+            name = u.first_name
+        except Exception as err:
+            print(err)
+
+        customer = stripe.Customer.create(
+            email = email,
+            name = name,
+            source="stripe" # request.post[stripeToken]
+        )
+        charge = stripe.Charge.create(
+            customer=customer,
+		    amount=total,
+		    currency='usd',
+		    description="Buying Pizza"
+        )
+    return render(request, "checkout.html")

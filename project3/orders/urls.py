@@ -15,4 +15,6 @@ urlpatterns = [
     path("orderhistory", views.orderhistory, name="orderhistory"),
     path("orderdetails/<int:id>", views.orderdetails, name="orderdetails"),
     path("cancelOrder", views.cancelOrder, name="cancelOrder"),
+    path("checkUser", views.checkUser, name="checkUser"),
+    path("checkout", views.checkout, name="checkout"),
 ]
