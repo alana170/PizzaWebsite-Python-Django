@@ -228,24 +228,54 @@ def checkUser(request) :
             return JsonResponse({"message": err}, status=400)   
 
 def checkout(request) :
-    if request.method == "POST" :
+    if request.method == "POST" and request.is_ajax():
         try: 
             total = OrderMaster.objects.filter(userid = request.user, status="open").first().total 
             u = request.user
-            email = u.email
-            name = u.first_name
+            print(u)
+            uobj = User.objects.filter(username=u).first()
+            email = uobj.email
+            name = uobj.first_name
+            print(total)
+            print(name+ " " + "  " + email+ " ")
         except Exception as err:
             print(err)
+            return JsonResponse({"message" : "Unable to identify user. Login and try again."}, status=400)
 
-        customer = stripe.Customer.create(
+        try:
+            token = stripe.Token.create(
+            card={
+            "number": request.POST['cardNumber'],
+            "exp_month": request.POST['exp_month'],
+            "exp_year": request.POST['exp_year'],
+            "cvc": request.POST['cvc'],
+            },
+            )
+
+            customer = stripe.Customer.create(
             email = email,
             name = name,
-            source="stripe" # request.post[stripeToken]
-        )
-        charge = stripe.Charge.create(
-            customer=customer,
-		    amount=total,
-		    currency='usd',
-		    description="Buying Pizza"
-        )
+            source= token.id,
+            )
+            #save stripe customer id, username, email in one model table - stripe customer info
+
+
+            charge = stripe.Charge.create(
+            amount=5000,
+            currency="usd",
+            source=token.id,
+            description="Buying Pizza",
+            )
+            #save charge id, amount, date processed, Payments Model 
+            
+
+        except Exception as err:
+            error = str(err)
+            print(error)
+            return JsonResponse({"message" :error }, status=400)
+        
+          
+        return JsonResponse({"message" : "Payment submitted successfully."},status=200)
     return render(request, "checkout.html")
+
+            
